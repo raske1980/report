@@ -80,10 +80,10 @@ namespace Report.Base
                 table.Rows.Add(row);
             }
 
-            var t = new TableElement(table);
-            t.TableStyle = tableStyle;
+            var tableElement = new TableElement(table);
+            tableElement.TableStyle = tableStyle;
 
-            return t;
+            return tableElement;
         }
     }
 

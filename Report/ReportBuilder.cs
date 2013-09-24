@@ -62,16 +62,32 @@ namespace Report
                           });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="headers"></param>
+        /// <param name="takeOutHeaders"></param>
+        /// <param name="tableStyle"></param>
+        /// <param name="headerStyle"></param>
         public override void AppendTable(DataTable data, IEnumerable<String> headers, IEnumerable<String> takeOutHeaders, Style tableStyle, Style headerStyle)
         {
             throw new NotImplementedException();
         }
 
-        public override void AppendTable(DataTable dataTable, IEnumerable<string> headers, Style tableStyle, Style headerStyle)
+        public override void AppendTable(DataTable dataTable, IEnumerable<string> headers, Style tableStyle = null, Style headerStyle = null)
         {
             var tableElement = new TableElement(dataTable);
-            tableElement.HeaderStyle = headerStyle as TableStyle;
-            tableElement.TableStyle = tableStyle as TableStyle;
+
+            if (tableStyle != null)
+            {
+                tableElement.HeaderStyle = headerStyle as TableStyle;
+            }
+
+            if (headerStyle != null)
+            {
+                tableElement.TableStyle = tableStyle as TableStyle;
+            }
 
             tableElement.Headers.Clear();
 

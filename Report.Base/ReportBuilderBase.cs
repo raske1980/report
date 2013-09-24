@@ -9,7 +9,7 @@ namespace Report.Base
         public abstract Report Build();
         public abstract void AppendTitle(String text, Style style);
         public abstract void AppendTextBlock(String text, Style style);
-        public abstract void AppendTable(DataTable data, IEnumerable<String> headers, Style tableStyle, Style headerStyle);
+        public abstract void AppendTable(DataTable data, IEnumerable<String> headers, Style tableStyle = null, Style headerStyle = null);
         public abstract void AppendTable(DataTable data, IEnumerable<String> headers, int takeOutNumber, Style tableStyle, Style headerStyle);
         public abstract void AppendTable(DataTable data, IEnumerable<String> headers, IEnumerable<String> takeOutHeaders, Style tableStyle, Style headerStyle);
         public abstract void AppendImage(System.Drawing.Image image);
