@@ -1,11 +1,8 @@
-﻿using Report.Base;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using Wordprocessing = DocumentFormat.OpenXml.Wordprocessing;
 using iTextSharp.text;
-using iTextSharp.text.html;
-using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
+using Report.Base;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +13,7 @@ using System.Text;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 using Style = Report.Base.Style;
 using TableStyle = Report.Base.TableStyle;
+using Wordprocessing = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Report
 {

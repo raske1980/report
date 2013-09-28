@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Report.Base;
+﻿using Report.Base;
 using System;
 using System.Collections.Generic;
 using System.Data;

@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Report.Base")]
+[assembly: AssemblyTitle("Reporting System")]
 [assembly: AssemblyDescription("https://github.com/DOIS/report")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("DOIS (КБ ИС)")]
-[assembly: AssemblyProduct("Report.Base")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
-[assembly: AssemblyTrademark("DOIS (КБ ИС)")]
+[assembly: AssemblyProduct("Reporting System")]
+[assembly: AssemblyCopyright("Copyright КБ ИС ©  2013")]
+[assembly: AssemblyTrademark("http://kbis.kpi.ua")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -37,9 +37,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
-    <Reference Include="itextsharp, Version=5.4.4.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\campus\statistic\trunk\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
+    <Reference Include="itextsharp">
+      <HintPath>..\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
