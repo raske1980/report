@@ -1,8 +1,11 @@
-﻿using DocumentFormat.OpenXml;
+﻿using Report.Base;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using Wordprocessing = DocumentFormat.OpenXml.Wordprocessing;
 using iTextSharp.text;
+using iTextSharp.text.html;
+using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
-using Report.Base;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,7 +16,6 @@ using System.Text;
 using Spreadsheet = DocumentFormat.OpenXml.Spreadsheet;
 using Style = Report.Base.Style;
 using TableStyle = Report.Base.TableStyle;
-using Wordprocessing = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Report
 {
@@ -60,7 +62,7 @@ namespace Report
                             }
 
                             var font = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
-                            font = PdfFontStyle(font, element.Style.FontType);
+                            font = PdfFontStyle(font, element.Style.TextStyle);
                             font.Size = (float)element.Style.FontSize;
                             font.Color = new BaseColor(element.Style.FontColor);
 
@@ -83,8 +85,8 @@ namespace Report
 
                             if (element.Headers.Count != 0)
                             {
-                                var headerFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(1251).BodyName, BaseFont.EMBEDDED);
-                                headerFont = PdfFontStyle(headerFont, element.Style.FontType);
+                                var headerFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
+                                headerFont = PdfFontStyle(headerFont, element.Style.TextStyle);
                                 headerFont.Size = (float)element.Style.FontSize;
                                 headerFont.Color = new BaseColor(element.Style.FontColor);
 
@@ -105,8 +107,8 @@ namespace Report
                             }
 
 
-                            var tableFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(1251).BodyName, BaseFont.EMBEDDED);
-                            tableFont = PdfFontStyle(tableFont, element.Style.FontType);
+                            var tableFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
+                            tableFont = PdfFontStyle(tableFont, element.Style.TextStyle);
                             tableFont.Size = (float)element.Style.FontSize;
                             tableFont.Color = new BaseColor(element.Style.FontColor);
 
@@ -169,11 +171,11 @@ namespace Report
 
                     // Append a new worksheet and associate it with the workbook.
                     var sheet = new Spreadsheet.Sheet()
-                                    {
-                                        Id = document.WorkbookPart.GetIdOfPart(worksheetPart),
-                                        SheetId = 1,
-                                        Name = "Sheet1"
-                                    };
+                    {
+                        Id = document.WorkbookPart.GetIdOfPart(worksheetPart),
+                        SheetId = 1,
+                        Name = "Sheet1"
+                    };
 
                     sheets.Append(sheet);
 
@@ -244,13 +246,13 @@ namespace Report
                         if (s != null)
                         {
                             var font = new Spreadsheet.Font
-                                                {
-                                                    FontName = new Spreadsheet.FontName { Val = new StringValue { Value = s.FontName } },
-                                                    FontSize = new Spreadsheet.FontSize { Val = s.FontSize },
-                                                    Color = new Spreadsheet.Color { Rgb = ToHexBinaryValue(s.FontColor) }
-                                                };
+                            {
+                                FontName = new Spreadsheet.FontName { Val = new StringValue { Value = s.FontName } },
+                                FontSize = new Spreadsheet.FontSize { Val = s.FontSize },
+                                Color = new Spreadsheet.Color { Rgb = ToHexBinaryValue(s.FontColor) }
+                            };
 
-                            switch (s.FontType)
+                            switch (s.TextStyle)
                             {
                                 case TextStyle.Bold: font.Bold = new Spreadsheet.Bold { Val = true }; break;
                                 case TextStyle.Italic: font.Italic = new Spreadsheet.Italic { Val = true }; break;
@@ -263,11 +265,11 @@ namespace Report
 
 
                             var cellFormat = new Spreadsheet.CellFormat
-                                                        {
-                                                            BorderId = UInt32Value.ToUInt32(styleId),
-                                                            FillId = UInt32Value.ToUInt32(styleId),
-                                                            FontId = UInt32Value.ToUInt32(styleId)
-                                                        };
+                            {
+                                BorderId = UInt32Value.ToUInt32(styleId),
+                                FillId = UInt32Value.ToUInt32(styleId),
+                                FontId = UInt32Value.ToUInt32(styleId)
+                            };
 
                             stylesPart.Stylesheet.CellFormats.AppendChild<Spreadsheet.CellFormat>(cellFormat);
                         }
@@ -298,11 +300,11 @@ namespace Report
                             }
 
                             var cell = new Spreadsheet.Cell
-                                           {
-                                               CellValue = new Spreadsheet.CellValue(value),
-                                               DataType = Spreadsheet.CellValues.String,
-                                               StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                                           };
+                            {
+                                CellValue = new Spreadsheet.CellValue(value),
+                                DataType = Spreadsheet.CellValues.String,
+                                StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+                            };
 
                             row.AppendChild(cell);
 
@@ -314,7 +316,8 @@ namespace Report
                             var element = x as TableElement;
                             if (element.Table.Rows.Count == 0)
                             {
-                                throw new Exception("The table is empty");
+                                //throw new Exception("The table is empty");
+                                continue;
                             }
 
                             if (element.Headers.Count != 0)
@@ -326,11 +329,11 @@ namespace Report
                                 foreach (var head in element.Headers)
                                 {
                                     var cell = new Spreadsheet.Cell
-                                                   {
-                                                       CellValue = new Spreadsheet.CellValue(head),
-                                                       DataType = Spreadsheet.CellValues.String,
-                                                       StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                                                   };
+                                    {
+                                        CellValue = new Spreadsheet.CellValue(head),
+                                        DataType = Spreadsheet.CellValues.String,
+                                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+                                    };
 
                                     row.AppendChild<Spreadsheet.Cell>(cell);
                                 }
@@ -347,11 +350,11 @@ namespace Report
                                 for (int j = 0; j < element.Table.Columns.Count; j++)
                                 {
                                     var cell = new Spreadsheet.Cell
-                                                   {
-                                                       CellValue = new Spreadsheet.CellValue(element.Table.Rows[i][j].ToString()),
-                                                       DataType = Spreadsheet.CellValues.String,
-                                                       StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                                                   };
+                                    {
+                                        CellValue = new Spreadsheet.CellValue(element.Table.Rows[i][j].ToString()),
+                                        DataType = Spreadsheet.CellValues.String,
+                                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+                                    };
 
                                     row.AppendChild(cell);
                                 }
@@ -370,11 +373,11 @@ namespace Report
                     var dateLine = shData.AppendChild(new Spreadsheet.Row());
 
                     dateLine.AppendChild(new Spreadsheet.Cell()
-                                             {
-                                                 CellValue = new Spreadsheet.CellValue(_report.TimeStamp.Date.ToString()),
-                                                 DataType = Spreadsheet.CellValues.String,
-                                                 StyleIndex = 0
-                                             });
+                    {
+                        CellValue = new Spreadsheet.CellValue(_report.TimeStamp.Date.ToString()),
+                        DataType = Spreadsheet.CellValues.String,
+                        StyleIndex = 0
+                    });
 
                     workbookpart.Workbook.Save();
                 }
@@ -397,15 +400,14 @@ namespace Report
                 document.AddMainDocumentPart();
                 document.MainDocumentPart.Document = new Wordprocessing.Document();
 
-                StyleDefinitionsPart stylesPart = document.MainDocumentPart.AddNewPart<StyleDefinitionsPart>();
-                Wordprocessing.Body body = document.MainDocumentPart.Document.AppendChild<Wordprocessing.Body>(new Wordprocessing.Body());
+                var stylesPart = document.MainDocumentPart.AddNewPart<StyleDefinitionsPart>();
+                var body = document.MainDocumentPart.Document.AppendChild<Wordprocessing.Body>(new Wordprocessing.Body());
 
 
                 var styles = _report.Select(o => o.Style).ToList();
                 stylesPart.Styles = WordStyles(styles);
                 stylesPart.Styles.Save();
-
-
+                
                 foreach (var x in _report)
                 {
                     if (x is TextElement)
@@ -414,20 +416,20 @@ namespace Report
 
                         if (element.Value == InternalContants.NewLine || element.Value == InternalContants.NewSection)
                         {
-                            body.AppendChild<Wordprocessing.Paragraph>(new Wordprocessing.Paragraph());
+                            body.AppendChild(new Wordprocessing.Paragraph());
                             continue;
                         }
 
-                        Wordprocessing.Text text = new Wordprocessing.Text(element.Value.ToString());
-                        Wordprocessing.Run run = new Wordprocessing.Run(text);
-                        Wordprocessing.Paragraph paragraph = new Wordprocessing.Paragraph(run);
+                        var text = new Wordprocessing.Text(element.Value);
+                        var run = new Wordprocessing.Run(text);
+                        var paragraph = new Wordprocessing.Paragraph(run);
 
                         paragraph.ParagraphProperties = new Wordprocessing.ParagraphProperties
                         {
                             ParagraphStyleId = new Wordprocessing.ParagraphStyleId()
-                            {
-                                Val = WordStyleIdFromStyleName(document, element.Style.Name)
-                            },
+                                 {
+                                     Val = WordStyleIdFromStyleName(document, element.Style.Name)
+                                 },
                             WordWrap = new Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
                             TextAlignment = new Wordprocessing.TextAlignment { Val = Wordprocessing.VerticalTextAlignmentValues.Auto },
                         };
@@ -440,19 +442,22 @@ namespace Report
                         var element = x as TableElement;
                         if (element.Table.Rows.Count == 0)
                         {
-                            throw new Exception("The table is empty");
+                            continue;
+
+                            //throw new Exception("The table is empty");
                         }
 
-                        Wordprocessing.Table table = new Wordprocessing.Table();
+                        var table = new Wordprocessing.Table();
 
                         if (element.Headers.Count != 0)
                         {
-                            Wordprocessing.TableRow row = new Wordprocessing.TableRow();
+                            var row = new Wordprocessing.TableRow();
+
                             foreach (var head in element.Headers)
                             {
-                                Wordprocessing.Text text = new Wordprocessing.Text(head.ToString());
-                                Wordprocessing.Run run = new Wordprocessing.Run(text);
-                                Wordprocessing.Paragraph paragraph = new Wordprocessing.Paragraph(run);
+                                var text = new Wordprocessing.Text(head.ToString());
+                                var run = new Wordprocessing.Run(text);
+                                var paragraph = new Wordprocessing.Paragraph(run);
 
                                 paragraph.ParagraphProperties = new Wordprocessing.ParagraphProperties
                                 {
@@ -464,7 +469,7 @@ namespace Report
                                     TextAlignment = new Wordprocessing.TextAlignment { Val = Wordprocessing.VerticalTextAlignmentValues.Auto },
                                 };
 
-                                Wordprocessing.TableCell cell = new Wordprocessing.TableCell(paragraph);
+                                var cell = new Wordprocessing.TableCell(paragraph);
 
                                 Wordprocessing.TableCellProperties cellprop = WordCellProperties(element.HeaderStyle);
                                 cell.Append(cellprop);
@@ -477,12 +482,13 @@ namespace Report
 
                         for (int i = 0; i < element.Table.Rows.Count; i++)
                         {
-                            Wordprocessing.TableRow row = new Wordprocessing.TableRow();
+                            var row = new Wordprocessing.TableRow();
+
                             for (int j = 0; j < element.Table.Columns.Count; j++)
                             {
-                                Wordprocessing.Text text = new Wordprocessing.Text(element.Table.Rows[i][j].ToString());
-                                Wordprocessing.Run run = new Wordprocessing.Run(text);
-                                Wordprocessing.Paragraph paragraph = new Wordprocessing.Paragraph(run);
+                                var text = new Wordprocessing.Text(element.Table.Rows[i][j].ToString());
+                                var run = new Wordprocessing.Run(text);
+                                var paragraph = new Wordprocessing.Paragraph(run);
 
                                 paragraph.ParagraphProperties = new Wordprocessing.ParagraphProperties
                                 {
@@ -494,9 +500,10 @@ namespace Report
                                     TextAlignment = new Wordprocessing.TextAlignment { Val = Wordprocessing.VerticalTextAlignmentValues.Auto },
                                 };
 
-                                Wordprocessing.TableCell cell = new Wordprocessing.TableCell(paragraph);
+                                var cell = new Wordprocessing.TableCell(paragraph);
 
-                                Wordprocessing.TableCellProperties cellprop = WordCellProperties(element.TableStyle);
+                                var cellprop = WordCellProperties(element.TableStyle);
+
                                 cell.Append(cellprop);
 
                                 row.Append(cell);
@@ -523,7 +530,7 @@ namespace Report
             return memoryStream.ToArray();
         }
 
-        public override byte[] ToHtml()
+        public virtual string RenderHtmlHead()
         {
             var head = new StringBuilder();
 
@@ -537,22 +544,27 @@ namespace Report
             //причем процентное соотношение будет браться от настроек браузера пользователя
             head.AppendFormat(" font-family: \"{0}\";", style.FontName);
             head.AppendFormat(" color: #{0};", ColorToRgb(style.FontColor));
-            head.AppendFormat(" {0};", FontStyle(style.FontType));
+            head.AppendFormat(" {0};", FontStyle(style.TextStyle));
             head.AppendFormat(" }}");
 
 
             var styles = _report.Select(o => o.Style).ToList();
-            head.AppendFormat("\n{0}", SetCssStyles(styles));
+            head.AppendFormat("\n{0}", RenderCssStyles(styles));
 
             head.AppendLine("\n</style>");
 
+            return head.ToString();
+        }
+
+        public override byte[] ToHtml()
+        {
             var document = new StringBuilder();
 
             document.AppendLine("<html>");
             document.AppendLine("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />");
 
             document.AppendLine("<head>");
-            document.AppendLine(head.ToString());
+            document.AppendLine(RenderHtmlHead());
             document.AppendLine("</head>");
 
             document.AppendLine("<body>");
@@ -569,7 +581,7 @@ namespace Report
 
             return memoryStream.ToArray();
         }
-
+        
         public virtual string ToHtmlBlock()
         {
             var body = new StringBuilder();
@@ -631,36 +643,47 @@ namespace Report
                 throw new Exception("Count of column titles  not equal to count of column headers.");
             }
 
-            sb.AppendLine("<table cellpadding=\"0\" cellspacing=\"0\">");
+            //sb.AppendLine("<table cellpadding=\"0\" cellspacing=\"0\">");
+
+            sb.AppendLine("<table cellpadding=\"0\" cellspacing=\"0\" class=\"for_replace\">");
 
             if (tableElement.Headers.Count != 0)
             {
-                sb.AppendLine("<thead>");
+                //sb.AppendLine("<thead>");
+                sb.AppendFormat("<thead class=\"{0}\">", tableElement.HeaderStyle.Name);
+                
                 //when we have column names
-                sb.AppendFormat("<tr class=\"{0}\">", tableElement.HeaderStyle.Name);
+                //sb.AppendFormat("<tr class=\"{0}\">", tableElement.HeaderStyle.Name);
+                sb.AppendLine("<tr>");
 
                 foreach (var c in tableElement.Headers)
                 {
-                    sb.AppendFormat("<th class=\"{0}\">{1}</td>", tableElement.HeaderStyle.Name, c);
+                    //sb.AppendFormat("<th class=\"{0}\">{1}</td>", tableElement.HeaderStyle.Name, c);
+                    sb.AppendFormat("<th>{0}</td>",c);
                 }
 
                 sb.AppendLine("</tr>");
                 sb.AppendLine("</thead>");
             }
 
-            sb.AppendLine("<tbody>");
+            //sb.AppendLine("<tbody>");
+            sb.AppendFormat("<tbody class=\"{0}\">", tableElement.TableStyle.Name);
+
             foreach (DataRow row in tableElement.Table.Rows)
             {
-                sb.AppendFormat("<tr class=\"{0}\">", tableElement.TableStyle.Name);
+                //sb.AppendFormat("<tr class=\"{0}\">", tableElement.TableStyle.Name);
+                sb.AppendLine("<tr>");
 
                 for (int i = 0; i < tableElement.Table.Columns.Count; i++)
                 {
                     var cell = row[i];
-                    sb.AppendFormat("<td class=\"{0}\">{1}</td>", tableElement.TableStyle.Name, cell);
+                    //sb.AppendFormat("<td class=\"{0}\">{1}</td>", tableElement.TableStyle.Name, cell);
+                    sb.AppendFormat("<td>{0}</td>", cell);
                 }
 
                 sb.AppendLine("</tr>");
             }
+
             sb.AppendLine("</tbody>");
             sb.AppendLine("</table>");
 
@@ -762,11 +785,11 @@ namespace Report
             }
         }
 
-        private static string SetCssStyles(IEnumerable<Style> stylesList)
+        private static string RenderCssStyles(IEnumerable<Style> styles)
         {
             var sb = new StringBuilder();
 
-            foreach (var style in stylesList)
+            foreach (var style in styles)
             {
                 if (style is TableStyle)
                 {
@@ -786,9 +809,9 @@ namespace Report
 
                 sb.AppendFormat(".{0} {{ ", style.Name);
                 sb.AppendFormat(" font-size: {0}%;", style.FontSize * 100 / 12);
-                sb.AppendFormat(" font-family: \"{0}\";", style.FontName);
+                //sb.AppendFormat(" font-family: \"{0}\";", style.FontName);
                 sb.AppendFormat(" color: #{0};", ColorToRgb(style.FontColor));
-                sb.AppendFormat(" {0};", FontStyle(style.FontType));
+                sb.AppendFormat(" {0};", FontStyle(style.TextStyle));
                 sb.AppendLine(" }");
             }
 
@@ -881,118 +904,76 @@ namespace Report
 
         private static string WordStyleIdFromStyleName(WordprocessingDocument document, string styleName)
         {
-            StyleDefinitionsPart stylePart = document.MainDocumentPart.StyleDefinitionsPart;
-            string styleId = stylePart.Styles.Descendants<Wordprocessing.StyleName>()
-                .Where(s => s.Val.Value.Equals(styleName) &&
-                    (((Wordprocessing.Style)s.Parent).Type == Wordprocessing.StyleValues.Paragraph))
-                .Select(n => ((Wordprocessing.Style)n.Parent).StyleId).FirstOrDefault();
+            var stylePart = document.MainDocumentPart.StyleDefinitionsPart;
+
+            //string styleId = stylePart.Styles.Descendants<Wordprocessing.StyleName>()
+            //    .Where(s => s.Val.Value.Equals(styleName) &&
+            //        (((Wordprocessing.Style)s.Parent).Type == Wordprocessing.StyleValues.Paragraph))
+            //    .Select(n => ((Wordprocessing.Style)n.Parent).StyleId).FirstOrDefault();
+
+            string styleId = (from o in stylePart.Styles.Descendants<Wordprocessing.StyleName>()
+                              where o.Val.Value == styleName  && (((Wordprocessing.Style) o.Parent).Type == Wordprocessing.StyleValues.Paragraph)
+                              select ((Wordprocessing.Style) o.Parent).StyleId).FirstOrDefault();
+
             return styleId;
         }
 
-        private static Wordprocessing.Styles WordStyles(List<Style> stylesList)
+        private static Wordprocessing.Styles WordStyles(IEnumerable<Style> stylesList)
         {
-            Wordprocessing.Styles styles = new Wordprocessing.Styles();
+            var styles = new Wordprocessing.Styles();
             int countId = 1;
+
             foreach (var s in stylesList)
             {
-                /*if (s is TableStyle)
-                {
-                    var style = s as TableStyle;
-                    Wordprocessing.Style tableStyle = new Wordprocessing.Style()
+                var paragraphStyle = new Wordprocessing.Style()
                     {
-                        Type = Wordprocessing.StyleValues.Table,
-                        StyleId = "t"+countId.ToString(),
+                        Type = Wordprocessing.StyleValues.Paragraph,
+                        StyleId = "p" + countId,
                         CustomStyle = true,
-                        Default = false
+                        Default = false,
+                        StyleName = new Wordprocessing.StyleName {Val = s.Name}
                     };
 
-                    var leftBorder = new Wordprocessing.LeftBorder();
-                    var rightBorder = new Wordprocessing.RightBorder();
-                    var topBorder = new Wordprocessing.TopBorder();
-                    var bottomBorder = new Wordprocessing.BottomBorder();
-                    var insideHorizontalBorder = new Wordprocessing.InsideHorizontalBorder();
-                    var insideVerticalBorder = new Wordprocessing.InsideVerticalBorder();
-
-                    leftBorder.Val  = SetWordLineType(style.BorderLine);
-                    rightBorder.Val = SetWordLineType(style.BorderLine);
-                    topBorder.Val = SetWordLineType(style.BorderLine);
-                    bottomBorder.Val = SetWordLineType(style.BorderLine);
-                    insideHorizontalBorder.Val = SetWordLineType(style.BorderLine);
-                    insideVerticalBorder.Val = SetWordLineType(style.BorderLine);
-
-                    leftBorder.Color = ColorToRgb(style.BorderColor);
-                    rightBorder.Color = ColorToRgb(style.BorderColor);
-                    topBorder.Color = ColorToRgb(style.BorderColor);
-                    bottomBorder.Color = ColorToRgb(style.BorderColor);
-                    insideHorizontalBorder.Color = ColorToRgb(style.BorderColor);
-                    insideVerticalBorder.Color = ColorToRgb(style.BorderColor);
-
-                    leftBorder.Size = SetBorderWaight(style.BorderLine);
-                    rightBorder.Size = SetBorderWaight(style.BorderLine);
-                    topBorder.Size = SetBorderWaight(style.BorderLine);
-                    bottomBorder.Size = SetBorderWaight(style.BorderLine);
-                    insideHorizontalBorder.Size = SetBorderWaight(style.BorderLine);
-                    insideVerticalBorder.Size = SetBorderWaight(style.BorderLine);
-
-                    Wordprocessing.TableProperties tabProp = new Wordprocessing.TableProperties
-                    {
-                        TableBorders = new Wordprocessing.TableBorders
+                //if (s.DocumentTitle == DocumentTitle.None)
+                //{
+                    var styleRunProperties = new Wordprocessing.StyleRunProperties
                         {
-                            LeftBorder = leftBorder,
-                            RightBorder = rightBorder,
-                            TopBorder = topBorder,
-                            BottomBorder = bottomBorder,
-                            InsideHorizontalBorder = insideHorizontalBorder,
-                            InsideVerticalBorder = insideVerticalBorder,
-                        },
-                    };
-                    Wordprocessing.TableCellProperties cellProperties = new Wordprocessing.TableCellProperties
-                    {
-                        Shading = new Wordprocessing.Shading 
-                        { 
-                            Val = Wordprocessing.ShadingPatternValues.Clear, 
-                            Fill = ColorToRgb(style.Foreground),
-                        },
-                    };
+                            Color = new Wordprocessing.Color() {Val = ColorToRgb(s.FontColor)},
+                            RunFonts = new Wordprocessing.RunFonts() {Ascii = s.FontName},
+                            FontSize = new Wordprocessing.FontSize() {Val = (s.FontSize*2).ToString()},
+                            Bold = s.TextStyle == TextStyle.Bold ? new Wordprocessing.Bold() : null,
+                            Italic = s.TextStyle == TextStyle.Italic ? new Wordprocessing.Italic() : null,
+                            Underline = s.TextStyle == TextStyle.Underline ? new Wordprocessing.Underline() : null
+                        };
 
-                    tableStyle.Append(tabProp);
-                    tableStyle.Append(cellProperties);
-                    styles.Append(tableStyle);
-                }*/
+                    var helpStyleRunProperties = WordFontStyle(s.TextStyle);
 
-                Wordprocessing.Style paragraphStyle = new Wordprocessing.Style()
-                {
-                    Type = Wordprocessing.StyleValues.Paragraph,
-                    StyleId = "p" + countId.ToString(),
-                    CustomStyle = true,
-                    Default = false,
-                    StyleName = new Wordprocessing.StyleName { Val = s.Name }
-                };
+                    paragraphStyle.Append(styleRunProperties);
+                    paragraphStyle.Append(helpStyleRunProperties);
+                //}
+                //else
+                //{
+                //    var styleRunProperties = new Wordprocessing.StyleRunProperties
+                //        {
+                //            RunFonts = new Wordprocessing.RunFonts() {Ascii = "Arial"},
+                //            FontSize = new Wordprocessing.FontSize() {Val = GetFontSizeFromDocumentTitle(s.DocumentTitle)},
+                //        };
 
-                Wordprocessing.StyleRunProperties styleRunProperties = new Wordprocessing.StyleRunProperties
-                {
-                    Color = new Wordprocessing.Color() { Val = ColorToRgb(s.FontColor) },
-                    RunFonts = new Wordprocessing.RunFonts() { Ascii = s.FontName },
-                    FontSize = new Wordprocessing.FontSize() { Val = (s.FontSize * 2).ToString() },
-                    //Bold = new Wordprocessing.Bold(),
-                    //Italic = new Wordprocessing.Italic(),
-                    //Underline = new Wordprocessing.Underline() { Val = Wordprocessing.UnderlineValues.Single },
-                };
+                //    paragraphStyle.Append(styleRunProperties);
+                //}
 
-                Wordprocessing.StyleRunProperties helpStyleRunProperties = WordFontStyle(s.FontType);
-
-                paragraphStyle.Append(styleRunProperties);
-                paragraphStyle.Append(helpStyleRunProperties);
                 styles.Append(paragraphStyle);
 
-                countId = countId + 1;
+                countId++;
             }
+
             return styles;
         }
-
+        
         private static Wordprocessing.StyleRunProperties WordFontStyle(TextStyle textStyle)
         {
-            Wordprocessing.StyleRunProperties property = new Wordprocessing.StyleRunProperties();
+            var property = new Wordprocessing.StyleRunProperties();
+
             switch (textStyle)
             {
                 case TextStyle.Bold: property.Bold = new Wordprocessing.Bold(); break;

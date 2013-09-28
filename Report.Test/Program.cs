@@ -10,10 +10,10 @@ namespace Report.Test
         static void Main(string[] args)
         {
             var bigTextblock = String.Empty;
-            
+
             #region Big textblock
 
-            bigTextblock= @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id nibh sed eros mollis varius vel id arcu. Phasellus facilisis, urna vitae laoreet blandit, justo neque vehicula metus, sit amet lobortis quam nulla quis eros. Vivamus in placerat nulla. Pellentesque ac elit adipiscing, ultrices magna ac, adipiscing libero. Morbi sit amet auctor est. Pellentesque ac adipiscing elit. Vivamus sollicitudin sollicitudin est consectetur cursus. Nullam ac posuere ligula. Vestibulum a auctor orci. Mauris in ipsum ornare, laoreet quam eget, porta urna. Donec quis ultricies velit. Donec suscipit non odio at gravida.
+            bigTextblock = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id nibh sed eros mollis varius vel id arcu. Phasellus facilisis, urna vitae laoreet blandit, justo neque vehicula metus, sit amet lobortis quam nulla quis eros. Vivamus in placerat nulla. Pellentesque ac elit adipiscing, ultrices magna ac, adipiscing libero. Morbi sit amet auctor est. Pellentesque ac adipiscing elit. Vivamus sollicitudin sollicitudin est consectetur cursus. Nullam ac posuere ligula. Vestibulum a auctor orci. Mauris in ipsum ornare, laoreet quam eget, porta urna. Donec quis ultricies velit. Donec suscipit non odio at gravida.
 
 Nullam mauris arcu, posuere in rhoncus at, facilisis eu elit. Aliquam sed sapien libero. Nunc consectetur quis elit et viverra. Nunc pulvinar faucibus sem, vitae suscipit diam consequat sit amet. Sed a mi purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Praesent mi felis, lobortis sit amet nibh vitae, dapibus sodales sem. Fusce ultrices eros at nisi rutrum, vel ornare nisl tincidunt.
 
@@ -54,7 +54,7 @@ Fusce sed neque viverra, mattis orci ac, ornare est. Morbi pellentesque enim pel
 
                 dataTable1.Rows.Add(row);
             }
-                  
+
             dataTable2.Columns.Add("Column 1");
             dataTable2.Columns.Add("Column 2");
 
@@ -175,7 +175,8 @@ Fusce sed neque viverra, mattis orci ac, ornare est. Morbi pellentesque enim pel
 
 
             reportBuilder.AppendTextBlock(bigTextblock, style5);
-            reportBuilder.AppendTable(dataTable2, new [] {"Колонка 1", "rjkjyrf 2"});
+            //reportBuilder.AppendTable(dataTable2, new [] {"Колонка 1", "rjkjyrf 2"});
+            reportBuilder.AppendTable(dataTable2, new[] { "Колонка 1", "rjkjyrf 2" }, style5, style1);
             reportBuilder.AppendTextBlock(bigTextblock, style5);
 
 

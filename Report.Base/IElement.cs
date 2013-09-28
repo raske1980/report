@@ -56,7 +56,7 @@ namespace Report.Base
             foreach (var item in items)
             {
                 var row = table.NewRow();
-                row[0] = item.ToString();
+					 row[0] = item.ToString().Replace("[", "").Replace("]", "");
                 table.Rows.Add(row);
             }
 
@@ -66,7 +66,7 @@ namespace Report.Base
             return t;
         }
 
-        public static TableElement Create<T1, T2>(IDictionary<T1, T2> records, TableStyle tableStyle)
+        public static TableElement Create<T1, T2>(IDictionary<T1, T2> records, Style tableStyle)
         {
             var table = new DataTable();
             table.Columns.Add();
@@ -80,10 +80,10 @@ namespace Report.Base
                 table.Rows.Add(row);
             }
 
-            var tableElement = new TableElement(table);
-            tableElement.TableStyle = tableStyle;
+            var t = new TableElement(table);
+            t.TableStyle = tableStyle as TableStyle; ;
 
-            return tableElement;
+            return t;
         }
     }
 
@@ -105,21 +105,15 @@ namespace Report.Base
         {
         }
 
+        public ImageElement(string url)
+        {
+            Url = new Uri(url);
+        }
+
         public ImageElement(System.Drawing.Image image)
         {
             Image = image;
         }
-
-        public ImageElement(string url)
-        {
-            Image = Image.FromFile(url);
-            Url = new Uri(url);
-        }
-
-        /*public ImageElement(System.Drawing.Image image)
-        {
-            Image = image;
-        }*/
 
         public Style Style { get; private set; }
     }

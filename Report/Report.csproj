@@ -39,7 +39,7 @@
     </Reference>
     <Reference Include="itextsharp, Version=5.4.4.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
+      <HintPath>..\..\..\..\campus\statistic\trunk\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,13 +55,13 @@
     <Compile Include="ReportRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Report.Base\Report.Base.csproj">
       <Project>{41e93192-1ce0-49bf-82f9-c7b6bcf2dcc6}</Project>
       <Name>Report.Base</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

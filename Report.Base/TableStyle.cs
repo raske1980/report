@@ -11,7 +11,7 @@ namespace Report.Base
         public Color Foreground { get; set; }
         public Color Background { get; set; }
         public PatternType PatternType { get; set; }
-
+        
         public TableStyle()
         {
             PatternType = PatternType.None;
