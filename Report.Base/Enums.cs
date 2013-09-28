@@ -38,8 +38,7 @@
         Top,
         Center,
         Bottom,
-        Justify,
-        Distributed
+        Justify
     }
 
     public enum HorizontalAligment

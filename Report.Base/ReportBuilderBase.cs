@@ -7,7 +7,7 @@ namespace Report.Base
     public abstract class ReportBuilderBase : IReportBuilder
     {
         public abstract Report Build();
-        //public abstract void AppendTitle(String text, Style style);
+        public abstract void AppendTitle(String text, Style style);
         public abstract void AppendTextBlock(String text, Style style);
         public abstract void AppendTable(DataTable data, IEnumerable<String> headers, Style tableStyle, Style headerStyle);
         public abstract void AppendTable(DataTable data, IEnumerable<String> headers, int takeOutNumber, Style tableStyle, Style headerStyle);
@@ -20,7 +20,12 @@ namespace Report.Base
         public abstract void AppendDictionary<T1, T2>(IDictionary<T1, T2> records, Style style);
         public abstract void AppendNewLine();
         public abstract void AppendNewSection();
-        
+
+        public virtual void AppendTitle(String text, int level = 1)
+        {
+            AppendTitle(text, new Style() { DocumentTitle = DocumentTitle.Heading1 });
+        }
+
         public virtual void AppendTextBlock(String text)
         {
             AppendTextBlock(text, new Style());

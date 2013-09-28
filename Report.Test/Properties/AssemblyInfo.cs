@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle("Report.Test")]
-[assembly: AssemblyDescription("https://github.com/DOIS")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("КБ ИС")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Report.Test")]
-[assembly: AssemblyCopyright("КБ ИС ©  2013")]
-[assembly: AssemblyTrademark("http://kbis.kpi.ua")]
+[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
