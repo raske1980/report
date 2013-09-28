@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("КБ ИС")]
 [assembly: AssemblyProduct("Report.Test")]
 [assembly: AssemblyCopyright("КБ ИС ©  2013")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("http://kbis.kpi.ua")]
 [assembly: AssemblyCulture("")]
 
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
