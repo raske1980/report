@@ -25,7 +25,7 @@
         Thick,
     }
 
-    public enum TextStyle
+    public enum TextStyleType
     {
         Normal,
         Bold,
@@ -38,7 +38,8 @@
         Top,
         Center,
         Bottom,
-        Justify
+        Justify,
+        Distributed
     }
 
     public enum HorizontalAligment

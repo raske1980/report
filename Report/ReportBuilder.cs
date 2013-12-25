@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Report.Merging.Item;
 
 namespace Report
 {
@@ -13,19 +14,18 @@ namespace Report
     {
         private readonly Report.Base.Report _report;
 
+        public Style DefaultStyle { get; set; }
+
         public ReportBuilder()
         {
             _report = new Base.Report();
+            DefaultStyle = new Style();
+
         }
 
         public virtual void Clear()
         {
             _report.Clear();
-        }
-
-        public override void AppendTitle(string text, Style styleName)
-        {
-            AppendTextBlock(text, styleName);
         }
 
         public override void AppendNewLine()
@@ -53,6 +53,14 @@ namespace Report
             AppendTextBlock(value, styleName);
         }
 
+        public void AppendComplexHeader(ComplexHeader header)
+        {
+            foreach (var item in header)
+            {
+                _report.Add(item);   
+            }
+        }
+
         public override void AppendTextBlock(string text, Style style)
         {
             _report.Add(new TextElement
@@ -67,11 +75,13 @@ namespace Report
             throw new NotImplementedException();
         }
 
-        public override void AppendTable(DataTable dataTable, IEnumerable<string> headers, Style tableStyle, Style headerStyle)
+        public override void AppendTable(DataTable data, IEnumerable<String> headers, Style tableStyle, Style headerStyle)
         {
-            var tableElement = new TableElement(dataTable);
-            tableElement.HeaderStyle = headerStyle as TableStyle;
-            tableElement.TableStyle = tableStyle as TableStyle;
+            var tableElement = new TableElement(data)
+                                   {
+                                       HeaderStyle = headerStyle as TableStyle,
+                                       TableStyle = tableStyle as TableStyle
+                                   };
 
             tableElement.Headers.Clear();
 
@@ -98,11 +108,12 @@ namespace Report
 
                 foreach (var subHeader in subHeaders)
                 {
-                    AppendTitle(subHeader, headerStyle);
+                    AppendTextBlock(subHeader, headerStyle);
 
                     var subRecords = (from o in dataTable.Rows.Cast<DataRow>()
                                       where o[count].ToString() == subHeader
                                       select o).ToList();
+
                     if (count != takeOutNumber - 1)
                     {
                         SubTable(subRecords, takeOutNumber, count, headers, tableStyle, headerStyle);
@@ -118,16 +129,18 @@ namespace Report
         private void SubTable(IEnumerable<DataRow> records, int takeOutNumber, int count, IEnumerable<String> headers, Style tableStyle, Style headerStyle)
         {
             count = count + 1;
+
             var subHeaders = (from o in records
                               select o[count].ToString()).Distinct().ToList();
 
             foreach (var subHeader in subHeaders)
             {
-                AppendTitle(subHeader, headerStyle);
+                AppendTextBlock(subHeader, headerStyle);
 
                 var subRecords = (from o in records
                                   where o[count].ToString() == subHeader
                                   select o).ToList();
+
                 if (count != takeOutNumber - 1)
                 {
                     SubTable(records, takeOutNumber, count, headers, tableStyle, headerStyle);
@@ -143,24 +156,27 @@ namespace Report
         {
             if (records != null && records.Any())
             {
-                DataTable dataTable = new DataTable();
+                var dataTable = new DataTable();
 
                 var someRecord = records.First();
                 var columnCount = someRecord.ItemArray.Count();
 
                 for (int i = takeOutNumber; i < columnCount; i++)
                 {
-                    DataColumn col = new DataColumn();
+                    var col = new DataColumn();
                     dataTable.Columns.Add(col);
                 }
 
                 foreach (var row in records)
                 {
-                    DataRow r = dataTable.NewRow();
+                    var r = dataTable.NewRow();
+
                     for (int i = takeOutNumber; i < columnCount; i++)
                     {
                         r[i - takeOutNumber] = row[i];
                     }
+
+                    dataTable.Rows.Add(r);
                 }
 
                 var tableElement = new TableElement(dataTable);
