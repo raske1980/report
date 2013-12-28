@@ -59,10 +59,6 @@
       <Project>{17DBC28D-7FC0-488C-B9A3-CEF1C78A3C28}</Project>
       <Name>Report</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RNPExcelExport\RNPExcelExport.csproj">
-      <Project>{BA0905CF-25F7-4326-BCDC-EA0FC858718F}</Project>
-      <Name>RNPExcelExport</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

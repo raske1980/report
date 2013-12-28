@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RNPExcelExport.Data.Collection;
-using RNPExcelExport.Data;
 using System.Data;
 using Report;
 using Report.Base;
@@ -48,15 +46,15 @@ namespace ConsoleTest
             reportRender.ToExcel(directory + "example3.xlsx");
         }
 
-        public static string Column(int column)
-        {
-            column--;
-            if (column >= 0 && column < 26)
-                return ((char)('A' + column)).ToString();
-            else if (column > 25)
-                return Column(column / 26) + Column(column % 26 + 1);
-            else
-                throw new Exception("Invalid Column #" + (column + 1).ToString());
-        }
+        //public static string Column(int column)
+        //{
+        //    column--;
+        //    if (column >= 0 && column < 26)
+        //        return ((char)('A' + column)).ToString();
+        //    else if (column > 25)
+        //        return Column(column / 26) + Column(column % 26 + 1);
+        //    else
+        //        throw new Exception("Invalid Column #" + (column + 1).ToString());
+        //}
     }
 }
