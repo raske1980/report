@@ -10,16 +10,24 @@ namespace ConsoleTest
         {
             column--;
             if (column >= 0 && column < 26)
+            {
                 return ((char)('A' + column)).ToString();
+            }
             else if (column > 25)
-                return GetColumn(column / 26) + GetColumn(column % 26 + 1);
+            {
+                return GetColumn(column/26) + GetColumn(column%26 + 1);
+            }
             else
+            {
                 throw new Exception("Invalid Column #" + (column + 1).ToString());
+            }
         }
 
         public static class RNPTable
         {
             private static ComplexHeader _RNPHeader;
+            private static ComplexHeader _RNPTableHeader;
+
             public static ComplexHeader RNPHeader(int columnOffset, int rowOffset, int startYear, string napryam, string discipline, string okr, string cafedra, string faculty, string studyForm, string studyTerm, string qualification)
             {
                 if (_RNPHeader == null)
@@ -65,9 +73,6 @@ namespace ConsoleTest
                 return GetColumn(column + columnOffset) + (row + rowOffset).ToString();
             }
 
-
-
-            private static ComplexHeader _RNPTableHeader;
             public static ComplexHeader RNPTableHeader(int columnOffset, int rowOffset, int kurs, int weekCount1, int weekCount2)
             {
                 int semestr = kurs * 2 - 1; //первый семестр курса
@@ -120,69 +125,6 @@ namespace ConsoleTest
                 return _RNPTableHeader;
             }
 
-
-            //private static DataTable _RNP;
-            //public static DataTable RNP
-            //{
-            //    get
-            //    {
-            //        if (_RNP == null)
-            //        {
-            //            _RNP = new DataTable();
-            //            for (int i = 0; i < RNPColumn.Count; i++)
-            //                _RNP.Columns.Add(RNPColumn[i]);
-            //        }
-
-            //        return _RNP;
-            //    }
-            //}
-
-            //private static SortedDictionary<int, string> _RNPColumn;
-            //public static SortedDictionary<int, string> RNPColumn
-            //{
-            //    get
-            //    {
-            //        if (_RNPColumn == null)
-            //        {
-            //            _RNPColumn = new SortedDictionary<int, string>();
-            //            _RNPColumn.Add(Columns.RowName, "Назва дисципліни");
-            //            _RNPColumn.Add(Columns.DivName, "Назва кафедри");
-            //            _RNPColumn.Add(Columns.CreditECTS, "Кредитів ECTS");
-            //            _RNPColumn.Add(Columns.HourFact, "Годин");
-            //            //_RNPRow.Add(ExamenCount, "Аудиторних годин всього");
-            //            //_RNPRow.Add(5, "Лекцій");
-            //            //_RNPRow.Add(6, "Практичні");
-            //            //_RNPRow.Add(7, "Лабораторні");
-            //            //_RNPRow.Add(7, "Самостійна робота студентів");
-            //            _RNPColumn.Add(Columns.ExamenCount, "Екзамени");
-            //            _RNPColumn.Add(Columns.ZalikCount, "Заліки");
-            //            _RNPColumn.Add(Columns.MkrCount, "МКР");
-            //            _RNPColumn.Add(Columns.CourseProjectCount, "Курсові проекти");
-            //            _RNPColumn.Add(Columns.CourseWorkCount, "Курсові роботи");
-            //            _RNPColumn.Add(Columns.RgrCount, "РГР");
-            //            _RNPColumn.Add(Columns.DkrCount, "ДКР");
-            //            _RNPColumn.Add(Columns.ReferatCount, "Реферати");
-            //        }
-
-            //        return _RNPColumn;
-            //    }
-            //}
-
-            //public static class Columns
-            //{
-            //    public const int RowName = 0;
-            //    public const int DivName = 1;
-            //    public const int CreditECTS = 2;
-            //    public const int HourFact = 3;
-            //    public const int ExamenCount = 4;//9;
-            //    public const int ZalikCount = 5;//10;
-            //    public const int MkrCount = 6;//11;
-            //    public const int CourseProjectCount = 7;//12;
-            //    public const int CourseWorkCount = 8;//13;
-            //    public const int RgrCount = 9;//14;
-            //    public const int DkrCount = 10;//15;
-            //    public const int ReferatCount = 11;//16;
-            //}
         }
     }
 }
