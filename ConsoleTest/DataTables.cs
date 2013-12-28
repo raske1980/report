@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Data;
-using Report.Merging.Item;
 using Report.Base;
+using Report.Merging.Item;
 
-namespace Constants
+namespace ConsoleTest
 {
     public static class DataTables
     {

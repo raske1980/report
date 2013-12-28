@@ -35,8 +35,8 @@ namespace ConsoleTest
                     DocumentTitle = DocumentTitle.Heading1
                 };
             ReportBuilder reportBuilder = new ReportBuilder();
-            reportBuilder.AppendComplexHeader(Constants.DataTables.RNPTable.RNPHeader(0, 0, 2013, "6.050201 Системна інженерія", "Компютеризовані та робототехнічні системи", "бакалавр", "Технічна кібернетика", "Факультет інформатики та обчислювальної техніки", "денна", "3 роки 10 місяців", "Молодший інженер з компютерної техніки"));
-            reportBuilder.AppendComplexHeader(Constants.DataTables.RNPTable.RNPTableHeader(0, 7, 3, 18, 18));
+            reportBuilder.AppendComplexHeader(DataTables.RNPTable.RNPHeader(0, 0, 2013, "6.050201 Системна інженерія", "Компютеризовані та робототехнічні системи", "бакалавр", "Технічна кібернетика", "Факультет інформатики та обчислювальної техніки", "денна", "3 роки 10 місяців", "Молодший інженер з компютерної техніки"));
+            reportBuilder.AppendComplexHeader(DataTables.RNPTable.RNPTableHeader(0, 7, 3, 18, 18));
             var report = reportBuilder.Build();
 
             var reportRender = new ReportRenderer(report);
