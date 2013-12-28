@@ -5,15 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{32C25981-E0CC-4D75-A247-1EE9EFC64227}</ProjectGuid>
+    <ProjectGuid>{D6571451-423B-4CFF-B5C3-14AC5C133F4A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Report.Test</RootNamespace>
-    <AssemblyName>Report.Test</AssemblyName>
+    <RootNamespace>ConsoleTest</RootNamespace>
+    <AssemblyName>ConsoleTest</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -35,22 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml">
-      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="itextsharp">
-      <HintPath>..\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -58,19 +44,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
-    <None Include="packages.config" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Constants\Constants.csproj">
+      <Project>{6314C658-4914-4F1F-97B4-F440F81B4B20}</Project>
+      <Name>Constants</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Report.Base\Report.Base.csproj">
-      <Project>{41e93192-1ce0-49bf-82f9-c7b6bcf2dcc6}</Project>
+      <Project>{41E93192-1CE0-49BF-82F9-C7B6BCF2DCC6}</Project>
       <Name>Report.Base</Name>
     </ProjectReference>
     <ProjectReference Include="..\Report\Report.csproj">
-      <Project>{17dbc28d-7fc0-488c-b9a3-cef1c78a3c28}</Project>
+      <Project>{17DBC28D-7FC0-488C-B9A3-CEF1C78A3C28}</Project>
       <Name>Report</Name>
     </ProjectReference>
   </ItemGroup>

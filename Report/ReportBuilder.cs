@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Report.Merging.Item;
 
 namespace Report
 {
@@ -50,6 +51,14 @@ namespace Report
         public override void AppendLine(string value, Style styleName)
         {
             AppendTextBlock(value, styleName);
+        }
+
+        public void AppendComplexHeader(ComplexHeader header)
+        {
+            foreach (var item in header)
+            {
+                _report.Add(item);   
+            }
         }
 
         public override void AppendTextBlock(string text, Style style)

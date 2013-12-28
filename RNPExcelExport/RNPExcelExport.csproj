@@ -2,21 +2,19 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{32C25981-E0CC-4D75-A247-1EE9EFC64227}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{BA0905CF-25F7-4326-BCDC-EA0FC858718F}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Report.Test</RootNamespace>
-    <AssemblyName>Report.Test</AssemblyName>
+    <RootNamespace>RNPExcelExport</RootNamespace>
+    <AssemblyName>RNPExcelExport</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,8 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,43 +32,38 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml">
-      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
-    </Reference>
-    <Reference Include="itextsharp">
-      <HintPath>..\packages\iTextSharp.5.4.4\lib\itextsharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Data\Collection\RNPBaseCollection.cs" />
+    <Compile Include="Data\Converter.cs" />
+    <Compile Include="Data\RnpAPI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Data\Item\RNPBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
-    <None Include="packages.config" />
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Constants\Constants.csproj">
+      <Project>{6314C658-4914-4F1F-97B4-F440F81B4B20}</Project>
+      <Name>Constants</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Report.Base\Report.Base.csproj">
-      <Project>{41e93192-1ce0-49bf-82f9-c7b6bcf2dcc6}</Project>
+      <Project>{41E93192-1CE0-49BF-82F9-C7B6BCF2DCC6}</Project>
       <Name>Report.Base</Name>
     </ProjectReference>
     <ProjectReference Include="..\Report\Report.csproj">
-      <Project>{17dbc28d-7fc0-488c-b9a3-cef1c78a3c28}</Project>
+      <Project>{17DBC28D-7FC0-488C-B9A3-CEF1C78A3C28}</Project>
       <Name>Report</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SQLExecuter\SQLExecuter.csproj">
+      <Project>{1BE9A5EE-FC66-469E-98CC-52AFDC5182A5}</Project>
+      <Name>SQLExecuter</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
