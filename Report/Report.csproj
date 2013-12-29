@@ -53,6 +53,11 @@
     <Compile Include="Merging\Item\ComplexHeaderCell.cs" />
     <Compile Include="Merging\MergeAPI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderers\ExcelRenderer.cs" />
+    <Compile Include="Renderers\HtmlRenderer.cs" />
+    <Compile Include="Renderers\PdfRenderer.cs" />
+    <Compile Include="Renderers\RendererBase.cs" />
+    <Compile Include="Renderers\WordRenderer.cs" />
     <Compile Include="ReportBuilder.cs" />
     <Compile Include="ReportRenderer.cs" />
     <Compile Include="Utils\HorizontalAlignmentMapper\ExcelHorizontalAlignmentMapper.cs" />

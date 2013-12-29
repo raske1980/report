@@ -6,7 +6,8 @@ using Report.Base;
 
 namespace Report.Merging.Item
 {
-    public class ComplexHeader : List<ComplexHeaderCell>
+    public class ComplexHeader : List<ComplexHeaderCell>, IElement
     {
+        public Style Style { get; set; }
     }
 }
