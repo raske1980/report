@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using iTextSharp.text;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Report.Base;
-using Report.Merging.Item;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Report.Renderers
 {
@@ -60,17 +57,31 @@ namespace Report.Renderers
                     if (x is ImageElement)
                     {
                         var element = x as ImageElement;
-                        Render(element, pdfDocument);
+
+                        if (Render(element, pdfDocument))
+                        {
+                            continue;
+                        }
                     }
 
                     if (x is ComplexHeaderCell)
                     {
+                        var element = x as ComplexHeaderCell;
 
+                        if (Render(element, pdfDocument))
+                        {
+                            continue;
+                        }
                     }
 
                     if (x is ComplexHeader)
                     {
+                        var element = x as ComplexHeader;
 
+                        if (Render(element, pdfDocument))
+                        {
+                            continue;
+                        }
                     }
                 }
 
@@ -84,6 +95,129 @@ namespace Report.Renderers
 
             return buffer;
         }
+
+        private bool Render(ComplexHeaderCell element, Document pdfDocument)
+        {
+            return Render(new TextElement()
+            {
+                Style = new Style
+                {
+                    FontColor = System.Drawing.Color.Red,
+                    TextStyle = new List<TextStyleType> { TextStyleType.Bold }
+                },
+                Value = "Rended for ComplexHeaderCell not implemented."
+            }, pdfDocument, "arialuniTff");
+        }
+
+        #region Render
+
+        private bool Render(ImageElement element, Document pdfDocument)
+        {
+            if ((element.Url == null || String.IsNullOrEmpty(element.Url.ToString())) && element.Image == null)
+            {
+                return true;
+            }
+
+            var image = iTextSharp.text.Image.GetInstance(element.Image, element.Image.RawFormat);
+            pdfDocument.Add(image);
+            return false;
+        }
+
+        private bool Render(TableElement element, Document pdfDocument, string fontName)
+        {
+            if (element.Table.Rows.Count == 0)
+            {
+                return true;
+                //throw new Exception("The table is empty");
+            }
+
+            var table = new PdfPTable(element.Table.Columns.Count);
+
+            if (element.Headers.Count != 0)
+            {
+                var headerFont = FontFactory.GetFont(fontName, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
+                headerFont = PdfFontStyle(headerFont, element.Style.TextStyle);
+                headerFont.Size = (float)element.Style.FontSize;
+                headerFont.Color = new BaseColor(element.Style.FontColor);
+
+                foreach (var head in element.Headers)
+                {
+                    var cell = new PdfPCell
+                    {
+                        Phrase = new Phrase(head, headerFont),
+                        BackgroundColor = new BaseColor(element.HeaderStyle.Foreground),
+                        BorderColor = new BaseColor(element.HeaderStyle.BorderColor),
+                        BorderWidth = PdfBorderWidth(element.HeaderStyle.BorderLine),
+                        NoWrap = element.HeaderStyle.Aligment.WrapText
+                    };
+
+                    table.AddCell(cell);
+                }
+            }
+
+
+            var tableFont = FontFactory.GetFont(fontName, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
+            tableFont = PdfFontStyle(tableFont, element.Style.TextStyle);
+            tableFont.Size = (float)element.Style.FontSize;
+            tableFont.Color = new BaseColor(element.Style.FontColor);
+
+            for (int i = 0; i < element.Table.Rows.Count; i++)
+            {
+                for (int j = 0; j < element.Table.Columns.Count; j++)
+                {
+                    var cell = new PdfPCell
+                    {
+                        Phrase = new Phrase(element.Table.Rows[i][j].ToString(), tableFont),
+                        BackgroundColor = new BaseColor(element.TableStyle.Foreground),
+                        BorderColor = new BaseColor(element.TableStyle.BorderColor),
+                        BorderWidth = PdfBorderWidth(element.TableStyle.BorderLine),
+                        NoWrap = element.TableStyle.Aligment.WrapText,
+                        HorizontalAlignment = PdfHorizontalAlignment(element.TableStyle.Aligment.HorizontalAligment),
+                        VerticalAlignment = PdfHorizontaVerticallAlignment(element.TableStyle.Aligment.VerticalAligment)
+                    };
+
+                    table.AddCell(cell);
+                }
+            }
+
+            pdfDocument.Add(table);
+            return false;
+        }
+
+        private bool Render(TextElement element, Document pdfDocument, string fontName)
+        {
+            if (element.Value == InternalContants.NewLine || element.Value == InternalContants.NewSection)
+            {
+                pdfDocument.Add(new Paragraph(new Phrase(" "))); //так должно быть!!!
+                return true;
+            }
+
+            var font = FontFactory.GetFont(fontName, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
+            font = PdfFontStyle(font, element.Style.TextStyle);
+            font.Size = (float)element.Style.FontSize;
+            font.Color = new BaseColor(element.Style.FontColor);
+
+
+            var paragraph = new Paragraph(element.Value, font);
+            paragraph.Alignment = PdfHorizontalAlignment(element.Style.Aligment.HorizontalAligment);
+            pdfDocument.Add(paragraph);
+            return false;
+        }
+
+        private bool Render(ComplexHeader element, Document pdfDocument)
+        {
+            return Render(new TextElement()
+            {
+                Style = new Style
+                {
+                    FontColor = System.Drawing.Color.Red,
+                    TextStyle = new List<TextStyleType> { TextStyleType.Bold }
+                },
+                Value = "Rended for ComplexHeader not implemented."
+            }, pdfDocument, "arialuniTff");
+        }
+
+        #endregion
 
         private static int PdfHorizontaVerticallAlignment(VerticalAligment verticalAligment)
         {
@@ -119,7 +253,7 @@ namespace Report.Renderers
 
         }
 
-        private static iTextSharp.text.Font PdfFontStyle(iTextSharp.text.Font font, List<TextStyleType> textStyle)
+        private static Font PdfFontStyle(iTextSharp.text.Font font, IEnumerable<TextStyleType> textStyle)
         {
             if (textStyle != null)
                 foreach (var item in textStyle)
@@ -134,99 +268,6 @@ namespace Report.Renderers
                 }
             return font;
         }
-
-        #region Render
-
-        private void Render(ImageElement element, Document pdfDocument)
-        {
-            var image = iTextSharp.text.Image.GetInstance(element.Image, element.Image.RawFormat);
-            pdfDocument.Add(image);
-        }
-
-        private bool Render(TableElement element, Document pdfDocument, string arialuniTff)
-        {
-            if (element.Table.Rows.Count == 0)
-            {
-                return true;
-                //throw new Exception("The table is empty");
-            }
-
-            var table = new PdfPTable(element.Table.Columns.Count);
-
-            if (element.Headers.Count != 0)
-            {
-                var headerFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName,
-                    BaseFont.EMBEDDED);
-                headerFont = PdfFontStyle(headerFont, element.Style.TextStyle);
-                headerFont.Size = (float)element.Style.FontSize;
-                headerFont.Color = new BaseColor(element.Style.FontColor);
-
-                foreach (var head in element.Headers)
-                {
-                    var cell = new PdfPCell
-                    {
-                        Phrase = new Phrase(head, headerFont),
-                        BackgroundColor = new BaseColor(element.HeaderStyle.Foreground),
-                        BorderColor = new BaseColor(element.HeaderStyle.BorderColor),
-                        BorderWidth = PdfBorderWidth(element.HeaderStyle.BorderLine),
-                        NoWrap = element.HeaderStyle.Aligment.WrapText
-                    };
-
-                    table.AddCell(cell);
-                }
-            }
-
-
-            var tableFont = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
-            tableFont = PdfFontStyle(tableFont, element.Style.TextStyle);
-            tableFont.Size = (float)element.Style.FontSize;
-            tableFont.Color = new BaseColor(element.Style.FontColor);
-
-            for (int i = 0; i < element.Table.Rows.Count; i++)
-            {
-                for (int j = 0; j < element.Table.Columns.Count; j++)
-                {
-                    var cell = new PdfPCell
-                    {
-                        Phrase = new Phrase(element.Table.Rows[i][j].ToString(), tableFont),
-                        BackgroundColor = new BaseColor(element.TableStyle.Foreground),
-                        BorderColor = new BaseColor(element.TableStyle.BorderColor),
-                        BorderWidth = PdfBorderWidth(element.TableStyle.BorderLine),
-                        NoWrap = element.TableStyle.Aligment.WrapText,
-                        HorizontalAlignment = PdfHorizontalAlignment(element.TableStyle.Aligment.HorizontalAligment),
-                        VerticalAlignment = PdfHorizontaVerticallAlignment(element.TableStyle.Aligment.VerticalAligment)
-                    };
-
-                    table.AddCell(cell);
-                }
-            }
-
-            pdfDocument.Add(table);
-            return false;
-        }
-
-        private bool Render(TextElement element, Document pdfDocument, string arialuniTff)
-        {
-            if (element.Value == InternalContants.NewLine || element.Value == InternalContants.NewSection)
-            {
-                pdfDocument.Add(new Paragraph(new Phrase(" "))); //так должно быть!!!
-                return true;
-            }
-
-            var font = FontFactory.GetFont(arialuniTff, System.Text.Encoding.GetEncoding(855).BodyName, BaseFont.EMBEDDED);
-            font = PdfFontStyle(font, element.Style.TextStyle);
-            font.Size = (float)element.Style.FontSize;
-            font.Color = new BaseColor(element.Style.FontColor);
-
-
-            var paragraph = new Paragraph(element.Value, font);
-            paragraph.Alignment = PdfHorizontalAlignment(element.Style.Aligment.HorizontalAligment);
-            pdfDocument.Add(paragraph);
-            return false;
-        }
-
-        #endregion
-
 
     }
 }

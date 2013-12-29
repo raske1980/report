@@ -133,9 +133,22 @@ namespace Report.Renderers
                     var element = x as ImageElement;
                     body.AppendLine(RenderImage(element));
                 }
+
+                if (x is ComplexHeaderCell)
+                {
+                    var element = x as ComplexHeaderCell;
+                    body.AppendLine("<div style=\"color: red; font-weight: bold;\">Rended for ComplexHeaderCell not implemented.</div>");
+                
+                }
+
+                if (x is ComplexHeader)
+                {
+                    var element = x as ComplexHeader;
+                    body.AppendLine("<div style=\"color: red; font-weight: bold;\">Rended for ComplexHeader not implemented.</div>");
+                }
             }
 
-            body.AppendFormat("<span>{0}</span>", report.TimeStamp.ToString());
+            body.AppendFormat("<span>{0}</span>", report.TimeStamp);
             body.AppendFormat("</section>");
 
             return body.ToString();

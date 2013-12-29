@@ -1,9 +1,12 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Report.Base;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Style = Report.Base.Style;
+using TableStyle = Report.Base.TableStyle;
 
 namespace Report.Renderers
 {
@@ -14,7 +17,8 @@ namespace Report.Renderers
     {
         public override byte[] Render(Base.Report report)
         {
-#warning Need to extend text style support
+
+            #warning Need to extend text style support
 
             var memoryStream = new MemoryStream();
 
@@ -37,112 +41,50 @@ namespace Report.Renderers
                     {
                         var element = x as TextElement;
 
-                        if (element.Value == InternalContants.NewLine || element.Value == InternalContants.NewSection)
+                        if (Render(element, document, body))
                         {
-                            body.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
                             continue;
                         }
-
-                        var text = new DocumentFormat.OpenXml.Wordprocessing.Text(element.Value);
-                        var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
-                        var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
-
-                        paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
-                        {
-                            ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
-                            {
-                                Val = WordStyleIdFromStyleName(document, element.Style.Name)
-                            },
-                            WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
-                            TextAlignment = new DocumentFormat.OpenXml.Wordprocessing.TextAlignment { Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto },
-                        };
-
-                        body.Append(paragraph);
                     }
 
                     if (x is TableElement)
                     {
                         var element = x as TableElement;
-                        if (element.Table.Rows.Count == 0)
+
+                        if (Render(element, document, body))
                         {
                             continue;
-
-                            //throw new Exception("The table is empty");
                         }
-
-                        var table = new DocumentFormat.OpenXml.Wordprocessing.Table();
-
-                        if (element.Headers.Count != 0)
-                        {
-                            var row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-
-                            foreach (var head in element.Headers)
-                            {
-                                var text = new DocumentFormat.OpenXml.Wordprocessing.Text(head.ToString());
-                                var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
-                                var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
-
-                                paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
-                                {
-                                    ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
-                                    {
-                                        Val = WordStyleIdFromStyleName(document, element.HeaderStyle.Name)
-                                    },
-                                    WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
-                                    TextAlignment = new DocumentFormat.OpenXml.Wordprocessing.TextAlignment { Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto },
-                                };
-
-                                var cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(paragraph);
-
-                                DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellprop = WordCellProperties(element.HeaderStyle);
-                                cell.Append(cellprop);
-
-                                row.Append(cell);
-                            }
-                            table.Append(row);
-                        }
-
-
-                        for (int i = 0; i < element.Table.Rows.Count; i++)
-                        {
-                            var row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
-
-                            for (int j = 0; j < element.Table.Columns.Count; j++)
-                            {
-                                var text = new DocumentFormat.OpenXml.Wordprocessing.Text(element.Table.Rows[i][j].ToString());
-                                var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
-                                var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
-
-                                paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
-                                {
-                                    ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
-                                    {
-                                        Val = WordStyleIdFromStyleName(document, element.TableStyle.Name)
-                                    },
-                                    WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
-                                    TextAlignment = new DocumentFormat.OpenXml.Wordprocessing.TextAlignment { Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto },
-                                };
-
-                                var cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(paragraph);
-
-                                var cellprop = WordCellProperties(element.TableStyle);
-
-                                cell.Append(cellprop);
-
-                                row.Append(cell);
-                            }
-                            table.Append(row);
-                        }
-                        body.AppendChild<DocumentFormat.OpenXml.Wordprocessing.Table>(table);
                     }
 
                     if (x is ImageElement)
                     {
-#warning Image element not implemented
-
                         var element = x as ImageElement;
-                        //body.AppendChild<Wordprocessing.Paragraph>();
-                        document.MainDocumentPart.Document.Save();
+
+                        if (Render(element, document, body))
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (x is ComplexHeaderCell)
+                    {
+                        var element = x as ComplexHeaderCell;
+
+                        if (Render(element, document, body))
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (x is ComplexHeader)
+                    {
+                        var element = x as ComplexHeader;
+
+                        if (Render(element, document, body))
+                        {
+                            continue;
+                        }
                     }
 
                     document.MainDocumentPart.Document.Save();
@@ -153,7 +95,152 @@ namespace Report.Renderers
             return memoryStream.ToArray();
         }
 
-        private static DocumentFormat.OpenXml.Wordprocessing.Styles WordStyles(IEnumerable<Style> stylesList)
+        #region Render
+
+        private static bool Render(ComplexHeaderCell element, WordprocessingDocument document, Body body)
+        {
+            return Render(new TextElement()
+            {
+                Style = new Style(),
+                Value = "Rended for ComplexHeaderCell not implemented."
+            }, document, body);
+        }
+
+        private static bool Render(ComplexHeader element, WordprocessingDocument document, Body body)
+        {
+            return Render(new TextElement()
+            {
+                Style = new Style(),
+                Value = "Rended for ComplexHeader not implemented."
+            }, document, body);
+        }
+
+        private static bool Render(ImageElement element, WordprocessingDocument document, Body body)
+        {
+
+#warning Image element not implemented
+            //body.AppendChild<Wordprocessing.Paragraph>();
+            document.MainDocumentPart.Document.Save();
+            return false;
+        }
+
+        private static bool Render(TextElement element, WordprocessingDocument document, Body body)
+        {
+            if (element.Value == InternalContants.NewLine || element.Value == InternalContants.NewSection)
+            {
+                body.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Paragraph());
+                return true;
+            }
+
+            var text = new DocumentFormat.OpenXml.Wordprocessing.Text(element.Value);
+            var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
+            var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
+
+            paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
+            {
+                ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
+                {
+                    Val = WordStyleIdFromStyleName(document, element.Style.Name)
+                },
+                WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
+                TextAlignment =
+                    new DocumentFormat.OpenXml.Wordprocessing.TextAlignment
+                    {
+                        Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto
+                    },
+            };
+
+            body.Append(paragraph);
+            return false;
+        }
+
+        private static bool Render(TableElement element, WordprocessingDocument document, Body body)
+        {
+            if (element.Table.Rows.Count == 0)
+            {
+                return true;
+
+                //throw new Exception("The table is empty");
+            }
+
+            var table = new DocumentFormat.OpenXml.Wordprocessing.Table();
+
+            if (element.Headers.Count != 0)
+            {
+                var row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+
+                foreach (var head in element.Headers)
+                {
+                    var text = new DocumentFormat.OpenXml.Wordprocessing.Text(head.ToString());
+                    var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
+                    var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
+
+                    paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
+                    {
+                        ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
+                        {
+                            Val = WordStyleIdFromStyleName(document, element.HeaderStyle.Name)
+                        },
+                        WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
+                        TextAlignment =
+                            new DocumentFormat.OpenXml.Wordprocessing.TextAlignment
+                            {
+                                Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto
+                            },
+                    };
+
+                    var cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(paragraph);
+
+                    DocumentFormat.OpenXml.Wordprocessing.TableCellProperties cellprop = WordCellProperties(element.HeaderStyle);
+                    cell.Append(cellprop);
+
+                    row.Append(cell);
+                }
+                table.Append(row);
+            }
+
+
+            for (int i = 0; i < element.Table.Rows.Count; i++)
+            {
+                var row = new DocumentFormat.OpenXml.Wordprocessing.TableRow();
+
+                for (int j = 0; j < element.Table.Columns.Count; j++)
+                {
+                    var text = new DocumentFormat.OpenXml.Wordprocessing.Text(element.Table.Rows[i][j].ToString());
+                    var run = new DocumentFormat.OpenXml.Wordprocessing.Run(text);
+                    var paragraph = new DocumentFormat.OpenXml.Wordprocessing.Paragraph(run);
+
+                    paragraph.ParagraphProperties = new DocumentFormat.OpenXml.Wordprocessing.ParagraphProperties
+                    {
+                        ParagraphStyleId = new DocumentFormat.OpenXml.Wordprocessing.ParagraphStyleId()
+                        {
+                            Val = WordStyleIdFromStyleName(document, element.TableStyle.Name)
+                        },
+                        WordWrap = new DocumentFormat.OpenXml.Wordprocessing.WordWrap { Val = new OnOffValue { Value = true } },
+                        TextAlignment =
+                            new DocumentFormat.OpenXml.Wordprocessing.TextAlignment
+                            {
+                                Val = DocumentFormat.OpenXml.Wordprocessing.VerticalTextAlignmentValues.Auto
+                            },
+                    };
+
+                    var cell = new DocumentFormat.OpenXml.Wordprocessing.TableCell(paragraph);
+
+                    var cellprop = WordCellProperties(element.TableStyle);
+
+                    cell.Append(cellprop);
+
+                    row.Append(cell);
+                }
+                table.Append(row);
+            }
+            body.AppendChild<DocumentFormat.OpenXml.Wordprocessing.Table>(table);
+            return false;
+        }
+
+        #endregion
+
+        private static Styles WordStyles(IEnumerable<Style> stylesList)
         {
             var styles = new DocumentFormat.OpenXml.Wordprocessing.Styles();
             int countId = 1;
@@ -205,7 +292,7 @@ namespace Report.Renderers
             return styles;
         }
 
-        private static DocumentFormat.OpenXml.Wordprocessing.StyleRunProperties WordFontStyle(List<TextStyleType> textStyle)
+        private static StyleRunProperties WordFontStyle(IEnumerable<TextStyleType> textStyle)
         {
             var property = new DocumentFormat.OpenXml.Wordprocessing.StyleRunProperties();
             foreach (var item in textStyle)
@@ -222,7 +309,7 @@ namespace Report.Renderers
             return property;
         }
 
-        private static DocumentFormat.OpenXml.Wordprocessing.TableCellProperties WordCellProperties(TableStyle style)
+        private static TableCellProperties WordCellProperties(TableStyle style)
         {
             var leftBorder = new DocumentFormat.OpenXml.Wordprocessing.LeftBorder();
             var rightBorder = new DocumentFormat.OpenXml.Wordprocessing.RightBorder();
@@ -288,7 +375,7 @@ namespace Report.Renderers
             return styleId;
         }
 
-        private static EnumValue<DocumentFormat.OpenXml.Wordprocessing.BorderValues> WordLineType(BoderLine borderLine)
+        private static EnumValue<BorderValues> WordLineType(BoderLine borderLine)
         {
             switch (borderLine)
             {

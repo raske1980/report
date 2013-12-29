@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Report
+namespace Report.Base
 {
-    public static class MergeAPI
+    public static class Merge
     {
         public static void MergeTwoCells(Worksheet worksheet, string cell1Name, string cell2Name, string text)
         {
@@ -31,7 +28,8 @@ namespace Report
             //CreateSpreadsheetCellIfNotExist(worksheet, cell2Name);
 
             MergeCells mergeCells;
-            if (worksheet.Elements<MergeCells>().Count() > 0)
+
+            if (worksheet.Elements<MergeCells>().Any())
             {
                 mergeCells = worksheet.Elements<MergeCells>().First();
             }

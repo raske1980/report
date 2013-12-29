@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Report.Base;
-using Report.Merging.Item;
 using Report.Utils.HorizontalAlignmentMapper;
-using Report.Utils.VerticalAlignmentMapper;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using TableStyle = Report.Base.TableStyle;
 
 namespace Report.Renderers
@@ -25,14 +22,14 @@ namespace Report.Renderers
                 {
                     // Add a WorkbookPart to the document.
                     var workbookpart = document.AddWorkbookPart();
-                    workbookpart.Workbook = new DocumentFormat.OpenXml.Spreadsheet.Workbook();
+                    workbookpart.Workbook = new Workbook();
 
                     // Add a WorksheetPart to the WorkbookPart.
                     var worksheetPart = workbookpart.AddNewPart<WorksheetPart>();
-                    worksheetPart.Worksheet = new DocumentFormat.OpenXml.Spreadsheet.Worksheet(new DocumentFormat.OpenXml.Spreadsheet.SheetData());
+                    worksheetPart.Worksheet = new Worksheet(new SheetData());
 
                     // Add Sheets to the Workbook.
-                    var sheets = document.WorkbookPart.Workbook.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Sheets>(new DocumentFormat.OpenXml.Spreadsheet.Sheets());
+                    var sheets = document.WorkbookPart.Workbook.AppendChild(new Sheets());
 
                     // Append a new worksheet and associate it with the workbook.
                     var sheet = new DocumentFormat.OpenXml.Spreadsheet.Sheet()
@@ -47,7 +44,7 @@ namespace Report.Renderers
                     // Add a WorkbookStylesPart to the WorkbookPart
                     var stylesPart = document.WorkbookPart.AddNewPart<WorkbookStylesPart>();
 
-                    var shData = worksheetPart.Worksheet.GetFirstChild<DocumentFormat.OpenXml.Spreadsheet.SheetData>();
+                    var shData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
 
 
 
@@ -155,12 +152,13 @@ namespace Report.Renderers
                             if (s.Aligment != null)
                             {
 
-                                Alignment align = new Alignment()
+                                var align = new Alignment()
                                 {
                                     TextRotation = new UInt32Value(s.Aligment.Rotation),
-                                    Horizontal = ExcelHorizontalAlignmentMapper.Map(s.Aligment.HorizontalAligment),
-                                    Vertical = ExcelVerticalAlignmentMapper.Map(s.Aligment.VerticalAligment)
+                                    Horizontal = AlignmentMapper.MapHorizontalAligment(s.Aligment.HorizontalAligment),
+                                    Vertical = AlignmentMapper.MapVerticalAligment(s.Aligment.VerticalAligment)
                                 };
+
                                 cellFormat.Append(align);
                             }
 
@@ -174,103 +172,41 @@ namespace Report.Renderers
                     {
                         if (x is ComplexHeaderCell)
                         {
-                            ComplexHeaderCell element = x as ComplexHeaderCell;
-                            styleId = GetStyleId(element.Style, styles);
-                            if (styleId > 0)
-                                element.Render(worksheetPart.Worksheet, styleId + 1);
-                            else
-                                element.Render(worksheetPart.Worksheet);
-                            workbookpart.Workbook.Save();
+                            var element = x as ComplexHeaderCell;
+
+                            if (Render(element, styles, shData, worksheetPart, workbookpart))
+                            {
+                                continue;
+                            }
                         }
 
                         if (x is TextElement)
                         {
                             var element = x as TextElement;
 
-                            var row = shData.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Row>(new DocumentFormat.OpenXml.Spreadsheet.Row());
-
-                            styleId = GetStyleId(element.Style, styles);
-
-                            var value = element.Value;
-
-                            if (element.Value == InternalContants.NewLine)
+                            if (Render(element, styles, shData, workbookpart))
                             {
-                                value = String.Empty;
+                                continue;
                             }
-
-                            if (element.Value == InternalContants.NewSection)
-                            {
-                                value = String.Empty;
-                            }
-
-                            var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
-                            {
-                                CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(value),
-                                DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
-                                StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                            };
-
-                            row.AppendChild(cell);
-
-                            workbookpart.Workbook.Save();
                         }
 
                         if (x is TableElement)
                         {
                             var element = x as TableElement;
-                            if (element.Table.Rows.Count == 0)
+                            if (Render(element, styles, shData, workbookpart))
                             {
-                                //throw new Exception("The table is empty");
                                 continue;
                             }
-
-                            if (element.Headers.Count != 0)
-                            {
-                                styleId = GetStyleId(element.HeaderStyle, styles);
-
-                                var row = shData.AppendChild(new DocumentFormat.OpenXml.Spreadsheet.Row());
-
-                                foreach (var head in element.Headers)
-                                {
-                                    var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
-                                    {
-                                        CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(head),
-                                        DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
-                                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                                    };
-
-                                    row.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Cell>(cell);
-                                }
-                                workbookpart.Workbook.Save();
-                            }
-
-
-                            styleId = GetStyleId(element.TableStyle, styles);
-
-                            for (int i = 0; i < element.Table.Rows.Count; i++)
-                            {
-                                var row = shData.AppendChild(new DocumentFormat.OpenXml.Spreadsheet.Row());
-
-                                for (int j = 0; j < element.Table.Columns.Count; j++)
-                                {
-                                    var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
-                                    {
-                                        CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(element.Table.Rows[i][j].ToString()),
-                                        DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
-                                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
-                                    };
-
-                                    row.AppendChild(cell);
-                                }
-                            }
-
-                            workbookpart.Workbook.Save();
                         }
 
                         if (x is ImageElement)
                         {
-#warning need to implement for ImageElement
-                            workbookpart.Workbook.Save();
+                            var element = x as ImageElement;
+
+                            if (Render(element, styles, shData, workbookpart))
+                            {
+                                continue;
+                            }
                         }
                     }
 
@@ -292,6 +228,116 @@ namespace Report.Renderers
             }
             return buffer;
         }
+
+        #region Render
+
+        private static bool Render(ImageElement element, ICollection<Style> styles, SheetData shData, WorkbookPart workbookpart)
+        {
+#warning need to implement for ImageElement
+            workbookpart.Workbook.Save();
+            return false;
+        }
+
+        private static bool Render(ComplexHeaderCell element, ICollection<Style> styles, SheetData shData, WorksheetPart worksheetPart, WorkbookPart workbookpart)
+        {
+            uint styleId;
+            styleId = GetStyleId(element.Style, styles);
+            if (styleId > 0)
+                element.Render(worksheetPart.Worksheet, styleId + 1);
+            else
+                element.Render(worksheetPart.Worksheet);
+            workbookpart.Workbook.Save();
+
+            return false;
+        }
+
+        private static bool Render(TableElement element, ICollection<Style> styles, SheetData shData, WorkbookPart workbookpart)
+        {
+            uint styleId;
+            if (element.Table.Rows.Count == 0)
+            {
+                //throw new Exception("The table is empty");
+                return true;
+            }
+
+            if (element.Headers.Count != 0)
+            {
+                styleId = GetStyleId(element.HeaderStyle, styles);
+
+                var row = shData.AppendChild(new DocumentFormat.OpenXml.Spreadsheet.Row());
+
+                foreach (var head in element.Headers)
+                {
+                    var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
+                    {
+                        CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(head),
+                        DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
+                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+                    };
+
+                    row.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Cell>(cell);
+                }
+                workbookpart.Workbook.Save();
+            }
+
+
+            styleId = GetStyleId(element.TableStyle, styles);
+
+            for (int i = 0; i < element.Table.Rows.Count; i++)
+            {
+                var row = shData.AppendChild(new DocumentFormat.OpenXml.Spreadsheet.Row());
+
+                for (int j = 0; j < element.Table.Columns.Count; j++)
+                {
+                    var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
+                    {
+                        CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(element.Table.Rows[i][j].ToString()),
+                        DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
+                        StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+                    };
+
+                    row.AppendChild(cell);
+                }
+            }
+
+            workbookpart.Workbook.Save();
+            return false;
+        }
+
+        private static bool Render(TextElement element, ICollection<Style> styles, SheetData shData, WorkbookPart workbookpart)
+        {
+            uint styleId;
+            var row = shData.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Row>(new DocumentFormat.OpenXml.Spreadsheet.Row());
+
+            styleId = GetStyleId(element.Style, styles);
+
+            var value = element.Value;
+
+            if (element.Value == InternalContants.NewLine)
+            {
+                value = String.Empty;
+            }
+
+            if (element.Value == InternalContants.NewSection)
+            {
+                value = String.Empty;
+            }
+
+            var cell = new DocumentFormat.OpenXml.Spreadsheet.Cell
+            {
+                CellValue = new DocumentFormat.OpenXml.Spreadsheet.CellValue(value),
+                DataType = DocumentFormat.OpenXml.Spreadsheet.CellValues.String,
+                StyleIndex = UInt32Value.FromUInt32(styleId + 1)
+            };
+
+            row.AppendChild(cell);
+
+            workbookpart.Workbook.Save();
+
+            return false;
+        }
+
+        #endregion
 
         private static BorderStyleValues SetLineType(BoderLine lineType)
         {

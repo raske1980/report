@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Report.Base;
 
-namespace Report.Merging.Item
+namespace Report.Base
 {
     public class ComplexHeaderCell : IElement
     {
         private string CellNameFrom { get; set; }
         private string CellNameTo { get; set; }
         private string CellText { get; set; }
+        public Style Style { get; set; }
 
         public ComplexHeaderCell(string cellNameFrom, string cellNameTo, string cellText, Style style)
         {
@@ -41,15 +37,10 @@ namespace Report.Merging.Item
         public void Render(Worksheet doc, uint styleid)
         {
             if (!string.IsNullOrEmpty(CellNameTo))
-                MergeAPI.MergeTwoCells(doc, CellNameFrom, CellNameTo, CellText, styleid);
+                Merge.MergeTwoCells(doc, CellNameFrom, CellNameTo, CellText, styleid);
             else
-                MergeAPI.CreateSpreadsheetCellIfNotExist(doc, CellNameFrom, CellText, styleid);
+                Merge.CreateSpreadsheetCellIfNotExist(doc, CellNameFrom, CellText, styleid);
         }
 
-        public Style Style
-        {
-            get;
-            set;
-        }
     }
 }
