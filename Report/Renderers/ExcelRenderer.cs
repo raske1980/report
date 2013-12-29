@@ -100,6 +100,14 @@ namespace Report.Renderers
                             var fill = new DocumentFormat.OpenXml.Spreadsheet.Fill { PatternFill = patternFill };
 
                             stylesPart.Stylesheet.Fills.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Fill>(fill);
+
+                            DocumentFormat.OpenXml.Spreadsheet.Font font = new DocumentFormat.OpenXml.Spreadsheet.Font()
+                            {
+                                FontName = new DocumentFormat.OpenXml.Spreadsheet.FontName { Val = new StringValue { Value = s.FontName } },
+                                FontSize = new DocumentFormat.OpenXml.Spreadsheet.FontSize { Val = s.FontSize },
+                                Color = new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = ToHexBinaryValue(s.FontColor) }
+                            };
+                            stylesPart.Stylesheet.Fonts.AppendChild<DocumentFormat.OpenXml.Spreadsheet.Font>(font);
                         }
                         else
                         {
