@@ -52,6 +52,14 @@ namespace Report
             AppendTextBlock(value, styleName);
         }
 
+        public void AppendComplexHeader(ComplexHeader header)
+        {
+            foreach (var item in header)
+            {
+                _report.Add(item);   
+            }
+        }
+
         public override void AppendTextBlock(string text, Style style)
         {
             _report.Add(new TextElement

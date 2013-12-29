@@ -1,14 +1,28 @@
 ﻿using System;
-using Report.Base;
 using System.Data;
+using Report;
+using Report.Base;
 using System.Drawing;
 
-namespace Report.Test
+namespace ConsoleTest
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+            var directory = @"c:\pub\";
+
+
+            Test1(directory, "example1");
+            Test2(directory, "example2");
+
+            Console.WriteLine("Done");
+            Console.ReadKey();
+        }
+
+        static void Test1(string directory, string name)
+        {
+
             var bigTextblock = String.Empty;
 
             #region Big textblock
@@ -69,45 +83,45 @@ Fusce sed neque viverra, mattis orci ac, ornare est. Morbi pellentesque enim pel
             var style0 = new TableStyle();
 
             var style1 = new TableStyle
-                             {
-                                 Foreground = Color.Blue,
-                                 PatternType = PatternType.Solid,
-                                 BorderLine = BoderLine.Thick,
-                                 BorderColor = Color.Orange,
-                                 DocumentTitle = DocumentTitle.Title
-                             };
+            {
+                Foreground = Color.Blue,
+                PatternType = PatternType.Solid,
+                BorderLine = BoderLine.Thick,
+                BorderColor = Color.Orange,
+                DocumentTitle = DocumentTitle.Title
+            };
 
             var style2 = new TableStyle
-                             {
-                                 FontColor = Color.Black,
-                                 FontSize = 5,
-                                 FontName = "Calibri",
-                                 Foreground = Color.Gray,
-                                 PatternType = PatternType.Solid,
-                                 BorderLine = BoderLine.Thin,
-                                 BorderColor = Color.Red,
-                                 DocumentTitle = DocumentTitle.Heading1
-                             };
+            {
+                FontColor = Color.Black,
+                FontSize = 5,
+                FontName = "Calibri",
+                Foreground = Color.Gray,
+                PatternType = PatternType.Solid,
+                BorderLine = BoderLine.Thin,
+                BorderColor = Color.Red,
+                DocumentTitle = DocumentTitle.Heading1
+            };
 
             var style3 = new TableStyle()
-                             {
-                                 FontColor = Color.Bisque,
-                                 FontSize = 16,
-                                 FontName = "C",
-                                 Foreground = Color.Green,
-                                 PatternType = PatternType.Solid,
-                                 DocumentTitle = DocumentTitle.Heading2
-                             };
+            {
+                FontColor = Color.Bisque,
+                FontSize = 16,
+                FontName = "C",
+                Foreground = Color.Green,
+                PatternType = PatternType.Solid,
+                DocumentTitle = DocumentTitle.Heading2
+            };
 
             var style4 = new TableStyle()
-                             {
-                                 FontColor = Color.LimeGreen,
-                                 FontSize = 30,
-                                 FontName = "Blackadder ITC",
-                                 Foreground = Color.Yellow,
-                                 PatternType = PatternType.Solid,
-                                 DocumentTitle = DocumentTitle.Heading3
-                             };
+            {
+                FontColor = Color.LimeGreen,
+                FontSize = 30,
+                FontName = "Blackadder ITC",
+                Foreground = Color.Yellow,
+                PatternType = PatternType.Solid,
+                DocumentTitle = DocumentTitle.Heading3
+            };
 
             var style5 = new TableStyle()
             {
@@ -120,38 +134,38 @@ Fusce sed neque viverra, mattis orci ac, ornare est. Morbi pellentesque enim pel
             };
 
             var tableStyle1 = new TableStyle
-                                  {
-                                      Foreground = Color.Blue,
-                                      PatternType = PatternType.Solid,
-                                      BorderLine = BoderLine.Thick,
-                                      BorderColor = Color.Orange,
-                                      DocumentTitle = DocumentTitle.None,
-                                      FontSize = 10,
-                                  };
+            {
+                Foreground = Color.Blue,
+                PatternType = PatternType.Solid,
+                BorderLine = BoderLine.Thick,
+                BorderColor = Color.Orange,
+                DocumentTitle = DocumentTitle.None,
+                FontSize = 10,
+            };
 
             var tableStyle2 = new TableStyle
-                                  {
-                                      FontColor = Color.Black,
-                                      FontSize = 10,
-                                      FontName = "Calibri",
-                                      Foreground = Color.Gray,
-                                      PatternType = PatternType.Solid,
-                                      BorderLine = BoderLine.Thick,
-                                      BorderColor = Color.Red,
-                                      DocumentTitle = DocumentTitle.None
-                                  };
+            {
+                FontColor = Color.Black,
+                FontSize = 10,
+                FontName = "Calibri",
+                Foreground = Color.Gray,
+                PatternType = PatternType.Solid,
+                BorderLine = BoderLine.Thick,
+                BorderColor = Color.Red,
+                DocumentTitle = DocumentTitle.None
+            };
 
             var tableStyle3 = new TableStyle
-                                  {
-                                      FontColor = Color.Black,
-                                      FontSize = 10,
-                                      FontName = "Calibri",
-                                      Foreground = Color.Gray,
-                                      PatternType = PatternType.Solid,
-                                      BorderLine = BoderLine.Thick,
-                                      BorderColor = Color.Red,
-                                      DocumentTitle = DocumentTitle.None
-                                  };
+            {
+                FontColor = Color.Black,
+                FontSize = 10,
+                FontName = "Calibri",
+                Foreground = Color.Gray,
+                PatternType = PatternType.Solid,
+                BorderLine = BoderLine.Thick,
+                BorderColor = Color.Red,
+                DocumentTitle = DocumentTitle.None
+            };
 
             string[] abs = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
 
@@ -184,13 +198,49 @@ Fusce sed neque viverra, mattis orci ac, ornare est. Morbi pellentesque enim pel
 
             var reportRender = new ReportRenderer(report);
 
-            var directory = @"c:\pub\";
 
-            reportRender.ToExcel(directory + "example.xlsx");
-            reportRender.ToHtml(directory + "example.html");
-            reportRender.ToPdf(directory + "example.pdf");
-            reportRender.ToWord(directory + "example.docx");
+            Save(reportRender, directory, name);
         }
 
+        static void Test2(string directory, string name)
+        {
+            var headerStyle = new TableStyle
+                {
+                    Foreground = Color.Blue,
+                    PatternType = PatternType.Solid,
+                    BorderLine = BoderLine.Thick,
+                    BorderColor = Color.Orange,
+                    DocumentTitle = DocumentTitle.Title,
+                    FontSize = 9,
+                };
+
+            var bodyStyle = new TableStyle
+                {
+                    FontColor = Color.Black,
+                    FontSize = 11,
+                    FontName = "Calibri",
+                    Foreground = Color.Bisque,
+                    PatternType = PatternType.Solid,
+                    BorderLine = BoderLine.Thin,
+                    BorderColor = Color.Red,
+                    DocumentTitle = DocumentTitle.Heading1
+                };
+
+            var reportBuilder = new ReportBuilder();
+            reportBuilder.AppendComplexHeader(DataTables.RNPTable.RNPHeader(0, 0, 2013, "6.050201 Системна інженерія", "Компютеризовані та робототехнічні системи", "бакалавр", "Технічна кібернетика", "Факультет інформатики та обчислювальної техніки", "денна", "3 роки 10 місяців", "Молодший інженер з компютерної техніки"));
+            reportBuilder.AppendComplexHeader(DataTables.RNPTable.RNPTableHeader(0, 7, 3, 18, 18));
+            var report = reportBuilder.Build();
+
+            var reportRender = new ReportRenderer(report);
+            Save(reportRender, directory, name);
+        }
+
+        private static void Save(ReportRenderer renderer, string directory, string name)
+        {
+            renderer.ToExcel(directory + name + ".xlsx");
+            renderer.ToHtml(directory + name + ".html");
+            renderer.ToPdf(directory + name + ".pdf");
+            renderer.ToWord(directory + name + ".docx");
+        }
     }
 }

@@ -25,7 +25,7 @@
         Thick,
     }
 
-    public enum TextStyle
+    public enum TextStyleType
     {
         Normal,
         Bold,
