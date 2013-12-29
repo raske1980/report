@@ -22,26 +22,23 @@ namespace Report.Base
 
         public String FontName { get; set; }
         public int FontSize { get; set; }
-        List<TextStyleType> _TextStyle;
+
+        private List<TextStyleType> _textStyle;
+
         public List<TextStyleType> TextStyle
         {
-            get
-            {
-                if (_TextStyle == null)
-                    _TextStyle = new List<TextStyleType>();
-                return _TextStyle;
-            }
+            get { return _textStyle ?? (_textStyle = new List<TextStyleType>()); }
             set
-            { _TextStyle = value; }
+            { _textStyle = value; }
         }
 
         private string TextStyleString
         {
             get
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (var item in TextStyle)
-                    sb.Append(item.ToString());
+                    sb.Append(item);
                 return sb.ToString();
             }
         }
