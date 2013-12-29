@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("DOIS (КБ ИС)")]
 [assembly: AssemblyProduct("Reporting System")]
 [assembly: AssemblyCopyright("Copyright КБ ИС ©  2013")]
-[assembly: AssemblyTrademark("http://kbis.kpi.ua")]
+[assembly: AssemblyTrademark("kbis.kpi.ua")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.4.0.*")]
+[assembly: AssemblyFileVersion("1.4.0.0")]

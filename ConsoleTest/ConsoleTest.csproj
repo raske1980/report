@@ -42,15 +42,12 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataTables.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Constants\Constants.csproj">
-      <Project>{6314C658-4914-4F1F-97B4-F440F81B4B20}</Project>
-      <Name>Constants</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Report.Base\Report.Base.csproj">
       <Project>{41E93192-1CE0-49BF-82F9-C7B6BCF2DCC6}</Project>
       <Name>Report.Base</Name>
